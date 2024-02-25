@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class WatchServiceImpl implements WatchService {
@@ -27,8 +28,8 @@ public class WatchServiceImpl implements WatchService {
         Map<String, Integer> watchCounts = new HashMap<>();
         List<Watch> watches = watchDao.getAllWatches();
 
-        validateWatches(watches, watchIds);
         watchIds.forEach(watchId -> watchCounts.put(watchId, watchCounts.getOrDefault(watchId, 0) + 1));
+        validateWatches(watches, watchCounts.keySet());
 
         return watches
                 .parallelStream()
@@ -37,8 +38,8 @@ public class WatchServiceImpl implements WatchService {
                 .orElseThrow(() -> new CheckoutCalculationException("Unable to checkout watches"));
     }
 
-    private void validateWatches(List<Watch> watches, List<String> watchIds) {
-        watchIds.parallelStream()
+    private void validateWatches(List<Watch> watches, Set<String> watchKeys) {
+        watchKeys.parallelStream()
                 .map(String::trim)
                 .filter(watchId -> watches.parallelStream().noneMatch((watch) -> watch.id().equals(watchId)))
                 .reduce((id1, id2) -> id1 + ", " + id2)
