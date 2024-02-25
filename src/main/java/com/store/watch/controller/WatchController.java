@@ -1,5 +1,8 @@
 package com.store.watch.controller;
 
+import com.store.watch.dto.CheckoutResponse;
+import com.store.watch.service.WatchService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,8 +13,16 @@ import java.util.List;
 @RestController
 public class WatchController {
 
+    private final WatchService watchService;
+
+    @Autowired
+    public WatchController(WatchService watchService) {
+        this.watchService = watchService;
+    }
+
     @PostMapping("/checkout")
     public ResponseEntity<?> checkoutWatches(@RequestBody List<String> watchIds) {
-        return ResponseEntity.ok(null);
+        int totalPrice = watchService.checkoutWatches(watchIds);
+        return ResponseEntity.ok(new CheckoutResponse(totalPrice));
     }
 }
