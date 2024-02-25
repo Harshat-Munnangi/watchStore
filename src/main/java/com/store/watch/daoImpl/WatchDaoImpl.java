@@ -11,6 +11,11 @@ public class WatchDaoImpl implements WatchDao {
 
     @Override
     public List<Watch> getAllWatches() {
-        return null;
+        return List.of(
+                new Watch("001", "Rolex", 100, 3, 200),
+                new Watch("002", "Michael Kors", 80, 2, 120),
+                new Watch("003", "Swatch", 50),
+                new Watch("004", "Casio", 30)
+        );
     }
 }
