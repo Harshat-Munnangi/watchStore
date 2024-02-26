@@ -30,7 +30,7 @@ public class WatchServiceImpl implements WatchService {
     }
 
     @Override
-    public int checkoutWatches(List<String> watchIds) throws WatchNotFoundException {
+    public int checkoutWatches(List<String> watchIds) {
         log.info("Received request to checkout watches with IDs: {}", watchIds);
 
         if (watchIds.isEmpty()) {
