@@ -86,6 +86,14 @@ public class WatchControllerIntTest {
     }
 
     @Test
+    void shouldNotCheckoutWithNoContent() throws Exception {
+        mockMvc.perform(post("/checkout").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Malformed JSON request"));
+    }
+
+    @Test
     void performanceTesting() {
         IntStream.range(0, 1000)
                 .parallel()

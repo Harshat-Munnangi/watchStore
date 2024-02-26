@@ -2,6 +2,7 @@ package com.store.watch.service;
 
 import com.store.watch.dao.WatchDao;
 import com.store.watch.dto.Watch;
+import com.store.watch.exception.EmptyWatchListException;
 import com.store.watch.exception.WatchNotFoundException;
 import com.store.watch.serviceImpl.WatchServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -36,7 +38,7 @@ public class WatchServiceTest {
 
     @BeforeEach
     void setUp() {
-        when(watchDao.getAllWatches()).thenReturn(watches);
+        when(watchDao.getWatchesList(anySet())).thenReturn(watches);
     }
 
     @Test
@@ -45,8 +47,9 @@ public class WatchServiceTest {
     }
 
     @Test
-    void shouldCheckoutWithEmptyWatchIds() {
-        assertEquals(0, watchService.checkoutWatches(emptyList()));
+    void shouldNotCheckoutWithEmptyWatchIdsList() {
+        EmptyWatchListException exception = assertThrows(EmptyWatchListException.class, () -> watchService.checkoutWatches(emptyList()));
+        assertEquals("No watches to checkout", exception.getMessage());
     }
 
     @Test
@@ -64,8 +67,8 @@ public class WatchServiceTest {
 
     @Test
     void shouldCheckoutWithDiscounts() {
-        int totalPrice = watchService.checkoutWatches(Arrays.asList("001", "002", "001", "002", "003"));
-        assertEquals(370, totalPrice);
+        int totalPrice = watchService.checkoutWatches(Arrays.asList("001", "002", "001", "001", "001", "002", "003"));
+        assertEquals(470, totalPrice);
     }
 
     @Test
@@ -73,5 +76,12 @@ public class WatchServiceTest {
         List<String> watchIds = Arrays.asList("001", "002", "005", "002", "0#1", "003");
         WatchNotFoundException exception = assertThrows(WatchNotFoundException.class, () -> watchService.checkoutWatches(watchIds));
         assertTrue(exception.getMessage().contains("005, 0#1"));
+    }
+
+    @Test
+    void shouldCheckoutWithWhiteSpacedWatchIds() {
+        List<String> watchIds = Arrays.asList(" 001", "002 ", " 003 ", "002", "001");
+        int totalPrice = watchService.checkoutWatches(watchIds);
+        assertEquals(370, totalPrice);
     }
 }

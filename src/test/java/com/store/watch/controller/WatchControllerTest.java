@@ -2,6 +2,7 @@ package com.store.watch.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.store.watch.exception.EmptyWatchListException;
 import com.store.watch.exception.WatchNotFoundException;
 import com.store.watch.service.WatchService;
 import org.junit.jupiter.api.Test;
@@ -40,11 +41,9 @@ public class WatchControllerTest {
     }
 
     @Test
-    void shouldCheckoutWithEmptyWatchIds() {
-        when(watchService.checkoutWatches(emptyList())).thenReturn(0);
-        ResponseEntity<?> response = watchController.checkoutWatches(emptyList());
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("{\"price\":0}", convertObjectToJson(response.getBody()));
+    void shouldNotCheckoutWithEmptyWatchIdsList() {
+        doThrow(new EmptyWatchListException("No watch input for checkout")).when(watchService).checkoutWatches(emptyList());
+        assertThrows(EmptyWatchListException.class, () -> watchController.checkoutWatches(emptyList()), "No watch input for checkout");
     }
 
     @Test
@@ -58,14 +57,6 @@ public class WatchControllerTest {
     void shouldNotCheckoutDueToUnexpectedError() {
         doThrow(new RuntimeException("Something went wrong")).when(watchService).checkoutWatches(anyList());
         assertThrows(RuntimeException.class, () -> watchController.checkoutWatches(Arrays.asList("213", "2343")), "Something went wrong");
-    }
-
-    @Test
-    void shouldCheckoutWithWhiteSpacedWatchIds() {
-        when(watchService.checkoutWatches(Arrays.asList("001", "002", "003", "002", "001"))).thenReturn(370);
-        ResponseEntity<?> response = watchController.checkoutWatches(Arrays.asList(" 001", "002 ", " 003 ", "002", "001"));
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("{\"price\":370}", convertObjectToJson(response.getBody()));
     }
 
     private String convertObjectToJson(Object object) {
