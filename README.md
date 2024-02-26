@@ -93,7 +93,7 @@ Body:
 
 ## Exception Handling
 
-- **400 Bad Request:** MethodArgumentNotValidException
+- **400 Bad Request:** MethodArgumentNotValidException, EmptyWatchListException
 - **404 Not Found:** WatchNotFoundException
 - **500 Internal Server Error:** CheckoutCalculationException and other unexpected errors
 
