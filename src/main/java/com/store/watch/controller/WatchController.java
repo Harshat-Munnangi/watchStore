@@ -22,8 +22,7 @@ public class WatchController {
 
     @PostMapping("/checkout")
     public ResponseEntity<?> checkoutWatches(@RequestBody List<String> watchIds) {
-        List<String> newWatchIds = watchIds.stream().map(String::trim).toList();
-        int totalPrice = watchService.checkoutWatches(newWatchIds);
-        return ResponseEntity.ok(new CheckoutResponse(totalPrice));
+        int totalCheckoutPrice = watchService.checkoutWatches(watchIds);
+        return ResponseEntity.ok(new CheckoutResponse(totalCheckoutPrice));
     }
 }
